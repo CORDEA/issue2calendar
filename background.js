@@ -19,24 +19,52 @@
 
 var background = {};
 
+background.selectedTab;
+background.title   = "";
+background.content = "";
+background.emails = [];
+background.dates = [];
+
+
 background.initialize = function() {
     background.listenRequest_();
     background.checkForValidUrl_();
 };
 
+background.log = function(msg) {
+    console.log(msg);
+}
+
 background.listenRequest_ = function () {
-    chrome.extension.onMessage.addListener(function(request, sender) {
-        console.log("listenRequest_");
+    chrome.runtime.onMessage.addListener(function(request, sender, optCallback) {
+        switch (request.method) {
+            case "pgaction.getData":
+                  console.log("---pgaction.getData---");
+                  if (optCallback) {
+                      optCallback({
+                          content: background.content,
+                          title: background.title,
+                          dates: background.dates,
+                          emails: background.emails});
+                  }
+                  break;
+            case "monitoring.sendData":
+                  background.content = request.content;
+                  background.title   = request.title;
+                  background.dates   = request.dates;
+                  background.emails  = request.emails;
+                  break;
+        }
     });
 }
 
 background.checkForValidUrl_ = function () {
     chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
-        console.log("check");
         if (tab.url.indexOf(constants.GITHUB_URL) > -1
                 && tab.url.indexOf('issues') > -1) {
             chrome.pageAction.show(tab.id);
-            chrome.tabs.sendMessage(tab.id, {text: "rewrite"});
+            chrome.tabs.sendMessage(tab.id, {method: "background.startMonitoring"});
+            background.selectedTab = tab.id;
         }
     });
 }

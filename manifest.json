@@ -3,7 +3,7 @@
     "version": "1.0",
     "description": "",
     "background": {
-        "scripts": ["lib/jquery.min.js", "background.js", "constants.js"],
+        "scripts": ["lib/jquery.min.js", "background.js", "constants.js", "calendar.js"],
         "persistent": false
     },
     "icons": {
@@ -13,9 +13,9 @@
     },
     "content_scripts": [{
         "matches": [
-            "https://github.com/*/issues/*"
+            "https://github.com/*/issues/new"
         ],
-        "js":      ["lib/jquery.min.js", "content.js", "markdownParser.js"],
+        "js":      ["lib/jquery.min.js", "monitoring.js", "markdownParser.js"],
         "run_at": "document_idle"
     }],
     "page_action": {
@@ -34,7 +34,7 @@
         "tabs",
         "identity",
         "activeTab",
-        "https://github.com/*/issues/*"
+        "https://github.com/*/issues/new"
     ],
     "manifest_version": 2
 }

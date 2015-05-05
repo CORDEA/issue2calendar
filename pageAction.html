@@ -1,11 +1,45 @@
 <html>
     <head>
         <link rel="stylesheet" href="pageAction.css">
+        <link rel="stylesheet" href="authButton.css">
+        <link rel="stylesheet" href="addButton.css">
     </head>
     <body>
-        <h1>Issue to Google Calendar</h1>
-        <form>
-            <button>Add</button>
-        </form>
+        <div id="form" class="form">
+            <form id="issue">
+                <p>
+                <input type="text" name="title" class="title general">
+                </p>
+                <p>
+                <textarea name="content" class="content general"></textarea>
+                </p>
+                <p class="period">
+                <label>period</label><br />
+                <input type="text" name="start" class="time general">
+                <input type="text" name="end" class="time general">
+                </p>
+                <p>
+                <label>mention</label>
+                <input type="text" name="mention" class="general">
+                </p>
+                <div class="add-button">
+                    <div class="addbutton-content">
+                        <span class="add-icon-font">plus</span>
+                        <span class="addbutton-text">Add</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="auth" class="auth">
+            <div class="general-button" id="authbutton">
+                <div class="button-content">
+                    <span class="icon-font">unlock</span>
+                    <span class="button-text">Authorize</span>
+                </div>
+            </div>
+        </div>
+        <script src="lib/jquery.min.js"></script>
+        <script src="pageAction.js"></script>
+        <script src="calendar.js"></script>
     </body>
 </html>

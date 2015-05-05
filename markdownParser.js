@@ -20,6 +20,7 @@
 var mdparser = {};
 
 mdparser.checkMarkdown = function (str) {
+    console.log("---checkMarkdown---");
     var lines = str.split('\n');
     var startRegex = "[-+*]+\\s+";
     var endRegex   = "\\s*:\\s*";
@@ -29,33 +30,40 @@ mdparser.checkMarkdown = function (str) {
     if (str.indexOf(priority) > -1) {
         periodExists = true;
     }
+    var content = "";
+    var regex = new RegExp(startRegex + "([a-z]+)" + endRegex);
+    content = str.split(regex)[0];
 
     for (var j in lines) {
-        var regex = new RegExp(startRegex + "([a-z]+)" + endRegex);
         if (regex.test(lines[j])) {
             var parameter = lines[j].replace(regex, '');
-            console.log(content.dates);
             switch (RegExp.$1) {
                 case "period":
-                    if (content.dates.length !== 2) {
+                    if (monitoring.dates.length !== 2) {
                         var res = mdparser.periodParser(parameter);
                         if (res != 1) {
-                            content.dates = res;
+                            monitoring.dates = res;
                             var dates = res;
                         }
                     }
                     break;
                 case "deadline":
-                    if (content.dates.length === 0 || !periodExists) {
+                    if (monitoring.dates.length === 0 || !periodExists) {
                         var res = mdparser.deadlineParser(parameter);
                         console.log(res);
                         if (res != 1) {
-                            content.dates = [res];
+                            monitoring.dates = [res];
                         }
                     }
                     break;
             }
         }
+    }
+
+    regex = new RegExp(startRegex + "mention" + "\\s*\\n+");
+    monitoring.content = content.split(regex)[0];
+    if (regex.test(str)) {
+        var res = mdparser.mentionParser(str.split(regex)[1]);
     }
 }
 
@@ -99,4 +107,35 @@ mdparser.deadlineParser = function (str) {
 
 mdparser.mentionParser = function (str) {
     console.log("---mentionParser---");
+
+    var regex = new RegExp("\\s{4}[-+*]\\s+@");
+    var lines = str.split('\n');
+    for (var i in lines) {
+        if (regex.test(lines[i])) {
+            var user = lines[i].replace(regex, '');
+            var url  = "https://github.com/" + user;
+            mdparser.urlParser(url);
+            ++monitoring.mentionUsers;
+        }
+    }
+}
+
+mdparser.urlParser = function (url) {
+    var mailTag = '<a class="email" href=".+">(.+)</a>';
+    var emailRegex = new RegExp(mailTag);
+    $.get(url, function(data){
+        emailRegex.exec(data);
+        var email = "";
+        var hexChars = RegExp.$1.split(";");
+        for (var i in hexChars) {
+            if (hexChars[i].length > 0) {
+                var hex = hexChars[i].replace("&#", "\\");
+                email += String.fromCharCode(parseInt(hex.substr(2), 16));
+            }
+        }
+
+        if (email.indexOf('@') > -1) {
+            monitoring.emails.push(email);
+        }
+    });
 }
