@@ -19,7 +19,11 @@
 
 var calendar = {};
 
-calendar.CALENDAR_EVENTS_API_URL = "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events";
+calendar.CALENDAR_EVENTS_API_URL =
+    "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events";
+
+calendar.CALENDAR_LIST_API_URL_ =
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList';
 
 calendar.requestAuthToken = function () {
     pgaction.log("---calendar.requestAuthToken---");
@@ -30,15 +34,30 @@ calendar.requestAuthToken = function () {
         }
         pgaction.log(authToken);
         pgaction.refreshUI();
+        calendar.getUserCalendars();
         return;
     });
 };
 
 calendar.addEvent = function(text, calendarId) {
+    chrome.storage.local.get("calendars", function(storage) {
+        if (chrome.runtime.lastError) {
+            pgaction.log(chrome.runtime.lastError.message);
+            return;
+        }
+        var storageIsEmpty = storage['calendars'] == undefined;
+        if (storageIsEmpty) {
+            calendar.getUserCalendars();
+        }
+        pgaction.log(storage['calendars']);
+    });
+
+    /*
     var addURL = calendar.CALENDAR_EVENTS_API_URL_.replace('{calendarId}', encodeURIComponent(calendarId))
         //  + parameters
     chrome.identity.getAuthToken({'interactive': false}, function (authToken) {
         if (chrome.runtime.lastError || !authToken) {
+            pgaction.log(chrome.runtime.lastError.message);
             return;
         }
 
@@ -48,7 +67,7 @@ calendar.addEvent = function(text, calendarId) {
                 'Authorization': 'Bearer ' + authToken
             },
             success: function(response) {
-                chrome.runtime.sendMessage({method: 'events.feed.fetch'});
+                //success
             },
             error: function(response) {
                 if (response.status === 401) {
@@ -58,4 +77,57 @@ calendar.addEvent = function(text, calendarId) {
 
         });
     });
+    */
 }
+
+calendar.getUserCalendars = function() {
+    pgaction.log("---calendar.getUserCalendars---");
+    /*
+       chrome.storage.local.get('calendars', function(storage) {
+       if (chrome.runtime.lastError) {
+       pgaction.log(chrome.runtime.lastError.message);
+       }
+       */
+    chrome.identity.getAuthToken({'interactive': false}, function (authToken) {
+        if (chrome.runtime.lastError) {
+            //refreshUI
+            pgaction.log(chrome.runtime.lastError.message);
+            return;
+        }
+
+        $.ajax(calendar.CALENDAR_LIST_API_URL_, {
+            headers: {
+                'Authorization': 'Bearer ' + authToken
+            },
+            success: function(data) {
+                var calendars = {};
+                for (var i in data.items) {
+                    var calendar = data.items[i];
+
+                    var calendarDict = {
+                        id: calendar.id,
+                        title: calendar.summary,
+                        editable: calendar.accessRole == "owner" || calendar.accessRole == "writer",
+                        description: calendar.description
+                    };
+
+                    calendars[calendar.id] = calendarDict;
+                }
+
+                chrome.storage.local.set({"calendars": calendars}, function () {
+                    if (chrome.runtime.lastError) {
+                        pgaction.log(chrome.runtime.lastError.message);
+                        return;
+                    }
+                });
+            },
+            error: function (response) {
+                if (response.status === 401) {
+                    chrome.identity.removeCachedAuthToken({ 'token': authToken }, function() {});
+                }
+            }
+        });
+    });
+}
+
+

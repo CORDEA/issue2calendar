@@ -70,6 +70,9 @@ pgaction.addEventToButton_ = function () {
     var authButton = document.getElementById("authbutton");
     authButton.addEventListener(
             "click", function(){calendar.requestAuthToken()}, false);
+    var addButton = document.getElementById("addbutton");
+    addButton.addEventListener(
+            "click", function(){calendar.addEvent()}, false);
 }
 
 pgaction.refreshUI = function (authenticated) {
@@ -78,8 +81,8 @@ pgaction.refreshUI = function (authenticated) {
         $("#auth").hide();
         return;
     }
-    $("#form").show();
-    $("#auth").hide();
+    $("#form").hide();
+    $("#auth").show();
 }
 
 pgaction.initialize();

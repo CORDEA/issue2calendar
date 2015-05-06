@@ -29,6 +29,9 @@ background.dates = [];
 background.initialize = function() {
     background.listenRequest_();
     background.checkForValidUrl_();
+    chrome.storage.local.get('calendars', function(storage) {
+        console.log(storage['calendars']);
+    });
 };
 
 background.log = function(msg) {
