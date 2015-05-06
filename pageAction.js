@@ -21,6 +21,7 @@ var pgaction = {};
 
 pgaction.initialize = function () {
     pgaction.log("---pgaction.initialize---");
+    pgaction.addOptionToSelectBox_();
     pgaction.showAuthButtonIfNotAuth_();
     pgaction.sendRequests_();
     pgaction.addEventToButton_();
@@ -29,6 +30,26 @@ pgaction.initialize = function () {
 
 pgaction.log = function (msg) {
     chrome.extension.getBackgroundPage().background.log(msg);
+}
+
+pgaction.addOptionToSelectBox_ = function () {
+    chrome.storage.local.get("calendars", function(storage) {
+        if (chrome.runtime.lastError) {
+            pgaction.log(chrome.runtime.lastError.message);
+            return;
+        }
+        var calendars = storage["calendars"];
+        pgaction.log(calendars);
+        for (var i in calendars) {
+            pgaction.log(calendars[i].title);
+            if (calendars[i].editable) {
+                var sel = document.getElementById('calendars');
+                var opt = document.createElement('option');
+                opt.appendChild(document.createTextNode(calendars[i].title));
+                sel.appendChild(opt);
+            }
+        }
+    });
 }
 
 pgaction.sendRequests_ = function () {

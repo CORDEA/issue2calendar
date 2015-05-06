@@ -84,17 +84,31 @@ mdparser.periodParser = function (str) {
     return dates;
 }
 
-mdparser.checkDateSyntax = function (date) {
+mdparser.checkDateSyntax = function (datetime) {
+    var datetime = datetime.split(' ');
+    var date = datetime[0];
+    var time = datetime.length === 2 && datetime[1];
+    var formatDate = '';
+
     var regex = new RegExp('[/]', 'g');
     date = date.replace(regex, '-');
     var dateSyntax = new RegExp("2\\d{3}-[01]*\\d-[0-3]*\\d");
     if (dateSyntax.test(date)) {
-        return mdparser.convertDateToIsoString(date);
+        formatDate += date;
     }
-    return 1;
+
+    var timeSyntax = new RegExp("[0-2]*\\d:[0-5]*\\d:[0-5]*\\d");
+    if (timeSyntax.test(time)) {
+        formatDate += time;
+    }
+
+    return mdparser.convertDateToIsoString_(formatDate);
 }
 
-mdparser.convertDateToIsoString = function (date) {
+mdparser.convertDateToIsoString_ = function (date) {
+    if (date.length === 0) {
+        return 1;
+    }
     formatDate = new Date(date);
     formattedDate = formatDate.toISOString().slice(0, -1) + "+09:00";
     return formattedDate;
@@ -125,7 +139,7 @@ mdparser.urlParser = function (url) {
     var emailRegex = new RegExp(mailTag);
     $.get(url, function(data){
         emailRegex.exec(data);
-        var email = "";
+        var email = '';
         var hexChars = RegExp.$1.split(";");
         for (var i in hexChars) {
             if (hexChars[i].length > 0) {

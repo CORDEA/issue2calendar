@@ -45,11 +45,11 @@ calendar.addEvent = function(text, calendarId) {
             pgaction.log(chrome.runtime.lastError.message);
             return;
         }
-        var storageIsEmpty = storage['calendars'] == undefined;
-        if (storageIsEmpty) {
-            calendar.getUserCalendars();
+        storage['calendars'] == undefined && calendar.getUserCalendars();
+        var calendars = storage['calendars'];
+        for (var i in calendars) {
+            pgaction.log(calendars[i]);
         }
-        pgaction.log(storage['calendars']);
     });
 
     /*

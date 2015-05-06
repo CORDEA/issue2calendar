@@ -8,7 +8,9 @@ body {
 }
 
 label {
-    font-size: 15px;
+    font-size: 14px;
+    color: #666;
+    margin-left: 25px;
 }
 
 textarea.content {
@@ -34,6 +36,18 @@ div.add-button {
 div.form {
     display:none;
     margin-top: 20px;
+}
+
+select.calendars {
+    width: 250px;
+    display: block;
+    margin: 0 auto;
+}
+
+select.calendars:focus {
+    outline: none;
+    border: 1px solid #1e90ff;
+    box-shadow: 0 0 5px #1e90ff;
 }
 
 .general {
