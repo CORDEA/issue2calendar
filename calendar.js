@@ -19,12 +19,6 @@
 
 var calendar = {};
 
-calendar.CALENDAR_EVENTS_API_URL_ =
-    "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events";
-
-calendar.CALENDAR_LIST_API_URL_ =
-    'https://www.googleapis.com/calendar/v3/users/me/calendarList';
-
 calendar.requestAuthToken = function () {
     pgaction.log("---calendar.requestAuthToken---");
     chrome.identity.getAuthToken({"interactive": true}, function (authToken) {
@@ -82,7 +76,7 @@ calendar.addEvent = function(text, calendarId) {
 
 calendar.sendAddRequestToCalendar = function (calendarId, elements) {
     pgaction.log("---calendar.sendAddRequestToCalendar---");
-    var addUrl = calendar.CALENDAR_EVENTS_API_URL_.replace('{calendarId}', encodeURIComponent(calendarId));
+    var addUrl = constants.CALENDAR_EVENTS_API_URL_.replace('{calendarId}', encodeURIComponent(calendarId));
 
     chrome.identity.getAuthToken({'interactive': false}, function (authToken) {
         if (chrome.runtime.lastError || !authToken) {
@@ -136,7 +130,7 @@ calendar.getUserCalendars = function() {
             return;
         }
 
-        $.ajax(calendar.CALENDAR_LIST_API_URL_, {
+        $.ajax(constants.CALENDAR_LIST_API_URL_, {
             headers: {
                 'Authorization': 'Bearer ' + authToken
             },

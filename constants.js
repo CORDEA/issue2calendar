@@ -20,3 +20,9 @@
 var constants = {};
 
 constants.GITHUB_URL = 'https://github.com/'
+
+constants.CALENDAR_EVENTS_API_URL_ =
+    "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events"
+
+constants.CALENDAR_LIST_API_URL_ =
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList'

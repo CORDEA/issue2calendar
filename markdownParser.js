@@ -33,32 +33,31 @@ mdparser.checkMarkdown = function (str) {
         if (regex.test(lines[j])) {
             var parameter = lines[j].replace(regex, '');
             if (monitoring.dates.length !== 2) {
-                var res = mdparser.periodParser(parameter);
+                var res = mdparser.periodParser_(parameter);
                 if (res != 1) {
                     monitoring.dates = res;
                     var dates = res;
                 }
             }
             break;
-            }
         }
     }
 
     regex = new RegExp(startRegex + "mention" + "\\s*\\n+");
     monitoring.content = content.split(regex)[0];
     if (regex.test(str)) {
-        var res = mdparser.mentionParser(str.split(regex)[1]);
+        var res = mdparser.mentionParser_(str.split(regex)[1]);
     }
 }
 
-mdparser.periodParser = function (str) {
-    console.log("---periodParser---");
+mdparser.periodParser_ = function (str) {
+    console.log("---periodParser_---");
     var separator = "[-~]";
     var regex = new RegExp("\\s+" + separator + "\\s+");
     var dates = str.split(regex);
     if (dates.length > 1) {
         for (var i in dates) {
-            var res = mdparser.checkDateSyntax(dates[i]);
+            var res = mdparser.checkDateSyntax_(dates[i]);
             if (res === 1) {
                 return 1;
             }
@@ -68,7 +67,7 @@ mdparser.periodParser = function (str) {
     return dates;
 }
 
-mdparser.checkDateSyntax = function (datetime) {
+mdparser.checkDateSyntax_ = function (datetime) {
     var datetime = datetime.split(' ');
     var date = datetime[0];
     var time = datetime.length === 2 && datetime[1];
@@ -98,8 +97,8 @@ mdparser.convertDateToIsoString_ = function (date) {
     return formattedDate;
 }
 
-mdparser.mentionParser = function (str) {
-    console.log("---mentionParser---");
+mdparser.mentionParser_ = function (str) {
+    console.log("---mentionParser_---");
 
     var regex = new RegExp("\\s{4}[-+*]\\s+@");
     var lines = str.split('\n');
@@ -107,13 +106,13 @@ mdparser.mentionParser = function (str) {
         if (regex.test(lines[i])) {
             var user = lines[i].replace(regex, '');
             var url  = "https://github.com/" + user;
-            mdparser.urlParser(url);
+            mdparser.urlParser_(url);
             ++monitoring.mentionUsers;
         }
     }
 }
 
-mdparser.urlParser = function (url) {
+mdparser.urlParser_ = function (url) {
     var mailTag = '<a class="email" href=".+">(.+)</a>';
     var emailRegex = new RegExp(mailTag);
     $.get(url, function(data){

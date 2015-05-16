@@ -19,13 +19,12 @@
 
 var pgaction = {};
 
-pgaction.initialize = function () {
-    pgaction.log("---pgaction.initialize---");
+pgaction.initialize_ = function () {
+    pgaction.log("---pgaction.initialize_---");
     pgaction.addOptionToSelectBox_();
     pgaction.showAuthButtonIfNotAuth_();
-    pgaction.sendRequests_();
+    pgaction.getFromStorage_();
     pgaction.addEventToButton_();
-    // pgaction.listenRequests_();
 }
 
 pgaction.log = function (msg) {
@@ -52,43 +51,40 @@ pgaction.addOptionToSelectBox_ = function () {
     });
 }
 
-pgaction.sendRequests_ = function () {
-    chrome.runtime.sendMessage({method: "pgaction.getData"}, function (response) {
-        pgaction.log(response.title);
+pgaction.editGotData_ = function (issues) {
+    pgaction.log(issues);
+    var start = issues.dates[0];
+    var end   = issues.dates[1];
 
-        var start;
-        var end;
-        if (response.dates.length > 1) {
-            start = response.dates[0];
-            end   = response.dates[1];
+    var mentions = "";
+    for (var i in issues.emails) {
+        if (i == (issues.emails.length - 1)) {
+            mentions += issues.emails[i];
         } else {
-            start = end = response.dates[0];
+            mentions += issues.emails[i] + ", ";
         }
+    }
 
-        var mentions = "";
-        for (var i in response.emails) {
-            if (i == (response.emails.length - 1)) {
-                mentions += response.emails[i];
-            } else {
-                mentions += response.emails[i] + ", ";
-            }
-        }
-
-        document.getElementsByName("content")[0].value = response.content;
-        document.getElementsByName("title")[0].value   = response.title;
-        document.getElementsByName("start")[0].value   = start;
-        document.getElementsByName("end")[0].value     = end;
-        document.getElementsByName("mention")[0].value = mentions;
-    });
+    document.getElementsByName("content")[0].value = issues.content;
+    document.getElementsByName("title")[0].value   = issues.title;
+    document.getElementsByName("start")[0].value   = start;
+    document.getElementsByName("end")[0].value     = end;
+    document.getElementsByName("mention")[0].value = mentions;
 }
 
-pgaction.listenRequests_ = function () {
-    chrome.runtime.onMessage.addListener(function (request, sender) {
+pgaction.getFromStorage_ = function () {
+    chrome.storage.local.get("issues", function(storage) {
+        if (chrome.runtime.lastError) {
+            pgaction.log(chrome.runtime.lastError.message);
+            return;
+        }
+
+        pgaction.editGotData_(storage["issues"]);
     });
 }
 
 pgaction.showAuthButtonIfNotAuth_ = function () {
-    console.log("---pgaction.showAuthButtonIfNotAuth---");
+    console.log("---pgaction.showAuthButtonIfNotAuth_---");
     chrome.identity.getAuthToken({"interactive": false}, function (authToken) {
         if (chrome.runtime.lastError || !authToken) {
             pgaction.refreshUI(false);
@@ -117,4 +113,4 @@ pgaction.refreshUI = function (authenticated) {
     $("#auth").show();
 }
 
-pgaction.initialize();
+pgaction.initialize_();

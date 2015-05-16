@@ -20,14 +20,8 @@
 var background = {};
 
 background.selectedTab;
-background.title   = "";
-background.content = "";
-background.emails = [];
-background.dates = [];
-
 
 background.initialize = function() {
-    background.listenRequest_();
     background.checkForValidUrl_();
     chrome.storage.local.get('calendars', function(storage) {
         console.log(storage['calendars']);
@@ -36,29 +30,6 @@ background.initialize = function() {
 
 background.log = function(msg) {
     console.log(msg);
-}
-
-background.listenRequest_ = function () {
-    chrome.runtime.onMessage.addListener(function(request, sender, optCallback) {
-        switch (request.method) {
-            case "pgaction.getData":
-                  console.log("---pgaction.getData---");
-                  if (optCallback) {
-                      optCallback({
-                          content: background.content,
-                          title: background.title,
-                          dates: background.dates,
-                          emails: background.emails});
-                  }
-                  break;
-            case "monitoring.sendData":
-                  background.content = request.content;
-                  background.title   = request.title;
-                  background.dates   = request.dates;
-                  background.emails  = request.emails;
-                  break;
-        }
-    });
 }
 
 background.checkForValidUrl_ = function () {
