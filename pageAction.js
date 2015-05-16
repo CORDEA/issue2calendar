@@ -55,8 +55,6 @@ pgaction.addOptionToSelectBox_ = function () {
 pgaction.sendRequests_ = function () {
     chrome.runtime.sendMessage({method: "pgaction.getData"}, function (response) {
         pgaction.log(response.title);
-        document.getElementsByName("content")[0].value = response.content;
-        document.getElementsByName("title")[0].value   = response.title;
 
         var start;
         var end;
@@ -66,8 +64,21 @@ pgaction.sendRequests_ = function () {
         } else {
             start = end = response.dates[0];
         }
-        document.getElementsByName("start")[0].value = start;
-        document.getElementsByName("end")[0].value   = end;
+
+        var mentions = "";
+        for (var i in response.emails) {
+            if (i == (response.emails.length - 1)) {
+                mentions += response.emails[i];
+            } else {
+                mentions += response.emails[i] + ", ";
+            }
+        }
+
+        document.getElementsByName("content")[0].value = response.content;
+        document.getElementsByName("title")[0].value   = response.title;
+        document.getElementsByName("start")[0].value   = start;
+        document.getElementsByName("end")[0].value     = end;
+        document.getElementsByName("mention")[0].value = mentions;
     });
 }
 

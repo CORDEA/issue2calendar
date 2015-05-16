@@ -19,7 +19,7 @@
 
 var calendar = {};
 
-calendar.CALENDAR_EVENTS_API_URL =
+calendar.CALENDAR_EVENTS_API_URL_ =
     "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events";
 
 calendar.CALENDAR_LIST_API_URL_ =
@@ -40,6 +40,30 @@ calendar.requestAuthToken = function () {
 };
 
 calendar.addEvent = function(text, calendarId) {
+    pgaction.log("---calendar.addEvent---");
+
+    var title       = document.getElementsByName("title")[0].value;
+    var content     = document.getElementsByName("content")[0].value;
+    var start       = document.getElementsByName("start")[0].value;
+    var end         = document.getElementsByName("end")[0].value;
+    var mentions    = document.getElementsByName("mention")[0].value;
+
+    var lineCode = new RegExp('\n', 'g');
+    content = content.replace(lineCode, '\\n');
+    title   = title.replace(lineCode, '');
+
+    var elements = {
+        "title":     title,
+        "content":   content,
+        "startTime": start,
+        "endTime":   end,
+        "mentions":  mentions
+    }
+
+    var selectCalendar  = document.getElementById("calendars");
+    var calendarName    = selectCalendar.options[selectCalendar.selectedIndex].text;
+    var calendarId;
+
     chrome.storage.local.get("calendars", function(storage) {
         if (chrome.runtime.lastError) {
             pgaction.log(chrome.runtime.lastError.message);
@@ -48,28 +72,46 @@ calendar.addEvent = function(text, calendarId) {
         storage['calendars'] == undefined && calendar.getUserCalendars();
         var calendars = storage['calendars'];
         for (var i in calendars) {
-            pgaction.log(calendars[i]);
+            pgaction.log(calendars[i].title);
+            if (calendars[i].title === calendarName) {
+                calendar.sendAddRequestToCalendar(calendars[i].id, elements);
+            }
         }
     });
+}
 
-    /*
-    var addURL = calendar.CALENDAR_EVENTS_API_URL_.replace('{calendarId}', encodeURIComponent(calendarId))
-        //  + parameters
+calendar.sendAddRequestToCalendar = function (calendarId, elements) {
+    pgaction.log("---calendar.sendAddRequestToCalendar---");
+    var addUrl = calendar.CALENDAR_EVENTS_API_URL_.replace('{calendarId}', encodeURIComponent(calendarId));
+
     chrome.identity.getAuthToken({'interactive': false}, function (authToken) {
         if (chrome.runtime.lastError || !authToken) {
             pgaction.log(chrome.runtime.lastError.message);
             return;
         }
 
-        $.ajax(quickAddUrl, {
+        var data =
+            '{ end: {dateTime: "' + elements["endTime"] + '"},' +
+            'start: {dateTime: "' + elements["startTime"] + '"},' +
+            'summary: "' + elements["title"] + '",' +
+            'description: "' + elements["content"] + '"}';
+
+        pgaction.log(data);
+
+        $.ajax({
+            url: addUrl,
+            data: data,
             type: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + authToken
+                'Authorization': 'Bearer ' + authToken,
+                'Content-Type': 'application/json'
             },
             success: function(response) {
+                pgaction.log("success");
                 //success
             },
             error: function(response) {
+                pgaction.log(response);
                 if (response.status === 401) {
                     chrome.identity.removeCachedAuthToken({ 'token': authToken }, function() {});
                 }
@@ -77,7 +119,6 @@ calendar.addEvent = function(text, calendarId) {
 
         });
     });
-    */
 }
 
 calendar.getUserCalendars = function() {

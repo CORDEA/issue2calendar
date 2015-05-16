@@ -53,32 +53,27 @@ monitoring.listenRequests_ = function () {
 
 monitoring.rewriteFormTag_ = function () {
     console.log("---monitoring.rewriteFormTag_---");
-    var form = document.getElementsByClassName("js-new-issue-form");
-    // form exists check
-    if (form.length > 0) {
-        console.log("find form");
-        var title = form[0].elements["issue[title]"];
-        var issue = form[0].elements["issue[body]"];
-        monitoring.extractFromForm_(issue.value);
-        issue.addEventListener(
+    var title = document.getElementById("issue_body");
+    var issue = document.getElementById("issue_title");
+    monitoring.extractFromForm_(issue.value);
+    issue.addEventListener(
             "input", function(){monitoring.textChange_(this.value, true)}, false);
-        issue.addEventListener(
+    issue.addEventListener(
             "blur", function(){monitoring.textChange_(this.value, false)}, false);
-        title.addEventListener(
+    title.addEventListener(
             "blur", function(){monitoring.textChange_(this.value, false)}, false);
-    }
 }
 
 monitoring.textChange_ = function (str, flag) {
     console.log("---monitoring.textChange_---");
-    if (monitoring.onchange % 10 === 0 || !flag) {
+    if (monitoring.onchange % 1 === 0 || !flag) {
         monitoring.extractFromForm_(str);
     }
     ++monitoring.onchange;
 }
 
 monitoring.extractFromForm_ = function (str) {
-    var title = document.getElementsByName("issue[title]")[0];
+    var title = document.getElementById("issue_title");
     monitoring.title = title.value;
     mdparser.checkMarkdown(str);
     monitoring.sendRequests_();

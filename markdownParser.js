@@ -25,37 +25,21 @@ mdparser.checkMarkdown = function (str) {
     var startRegex = "[-+*]+\\s+";
     var endRegex   = "\\s*:\\s*";
 
-    var priority = "period";
-    var periodExists = false;
-    if (str.indexOf(priority) > -1) {
-        periodExists = true;
-    }
     var content = "";
-    var regex = new RegExp(startRegex + "([a-z]+)" + endRegex);
+    var regex = new RegExp(startRegex + "period" + endRegex);
     content = str.split(regex)[0];
 
     for (var j in lines) {
         if (regex.test(lines[j])) {
             var parameter = lines[j].replace(regex, '');
-            switch (RegExp.$1) {
-                case "period":
-                    if (monitoring.dates.length !== 2) {
-                        var res = mdparser.periodParser(parameter);
-                        if (res != 1) {
-                            monitoring.dates = res;
-                            var dates = res;
-                        }
-                    }
-                    break;
-                case "deadline":
-                    if (monitoring.dates.length === 0 || !periodExists) {
-                        var res = mdparser.deadlineParser(parameter);
-                        console.log(res);
-                        if (res != 1) {
-                            monitoring.dates = [res];
-                        }
-                    }
-                    break;
+            if (monitoring.dates.length !== 2) {
+                var res = mdparser.periodParser(parameter);
+                if (res != 1) {
+                    monitoring.dates = res;
+                    var dates = res;
+                }
+            }
+            break;
             }
         }
     }
@@ -112,11 +96,6 @@ mdparser.convertDateToIsoString_ = function (date) {
     formatDate = new Date(date);
     formattedDate = formatDate.toISOString().slice(0, -1) + "+09:00";
     return formattedDate;
-}
-
-mdparser.deadlineParser = function (str) {
-    console.log("---deadlineParser---");
-    return mdparser.checkDateSyntax(str);
 }
 
 mdparser.mentionParser = function (str) {
