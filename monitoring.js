@@ -45,8 +45,8 @@ monitoring.listenRequests_ = function () {
 
 monitoring.rewriteFormTag_ = function () {
     console.log("---monitoring.rewriteFormTag_---");
-    var title = document.getElementById("issue_body");
-    var issue = document.getElementById("issue_title");
+    var title = document.getElementById("issue_title");
+    var issue = document.getElementById("issue_body");
     monitoring.extractFromForm_(issue.value);
     issue.addEventListener(
             "input", function(){monitoring.textChange_(this.value, true)}, false);
@@ -58,7 +58,7 @@ monitoring.rewriteFormTag_ = function () {
 
 monitoring.textChange_ = function (str, flag) {
     console.log("---monitoring.textChange_---");
-    if (monitoring.onchange % 10 === 0 || !flag) {
+    if (monitoring.onchange % 5 === 0 || !flag) {
         monitoring.extractFromForm_(str);
     }
     ++monitoring.onchange;

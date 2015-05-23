@@ -84,17 +84,37 @@ calendar.sendAddRequestToCalendar = function (calendarId, elements) {
             return;
         }
 
-        var data =
-            '{ end: {dateTime: "' + elements["endTime"] + '"},' +
-            'start: {dateTime: "' + elements["startTime"] + '"},' +
-            'summary: "' + elements["title"] + '",' +
-            'description: "' + elements["content"] + '"}';
+        var data = {};
+        data.end = {};
+        data.start = {};
+        data.end.dateTime = elements["endTime"];
+        data.start.dateTime = elements["startTime"];
+        data.summary = elements["title"];
+        data.description = elements["contact"];
+        data.attendees = [];
+        var emails = elements["mentions"].split(", ");
+        for (var i in emails) {
+            if (emails[i].length > 0) {
+                var attendee = {};
+                attendee.email = emails[i];
+                data.attendees.push(attendee);
+            }
+        }
+        
+        var json = JSON.stringify(data);
+
+        // var data =
+            // '{ end: {dateTime: "' + elements["endTime"] + '"},' +
+            // 'start: {dateTime: "' + elements["startTime"] + '"},' +
+            // 'summary: "' + elements["title"] + '",' +
+            // 'description: "' + elements["content"] + '",' +
+            // 'attendees: [{' + '"};
 
         pgaction.log(data);
 
         $.ajax({
             url: addUrl,
-            data: data,
+            data: json,
             type: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + authToken,

@@ -32,14 +32,14 @@ mdparser.checkMarkdown = function (str) {
     for (var j in lines) {
         if (regex.test(lines[j])) {
             var parameter = lines[j].replace(regex, '');
-            if (monitoring.dates.length !== 2) {
-                var res = mdparser.periodParser_(parameter);
-                if (res != 1) {
-                    monitoring.dates = res;
-                    var dates = res;
-                }
+            var res = mdparser.periodParser_(parameter);
+            if (res != 1) {
+                monitoring.dates = res;
+                var dates = res;
             }
             break;
+        } else {
+            monitoring.dates = [];
         }
     }
 
@@ -47,6 +47,8 @@ mdparser.checkMarkdown = function (str) {
     monitoring.content = content.split(regex)[0];
     if (regex.test(str)) {
         var res = mdparser.mentionParser_(str.split(regex)[1]);
+    } else {
+        monitoring.emails = [];
     }
 }
 
@@ -127,7 +129,9 @@ mdparser.urlParser_ = function (url) {
         }
 
         if (email.indexOf('@') > -1) {
-            monitoring.emails.push(email);
+            if ($.inArray(email, monitoring.emails) === -1) {
+                monitoring.emails.push(email);
+            }
         }
     });
 }
