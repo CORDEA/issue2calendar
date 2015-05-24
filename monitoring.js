@@ -69,6 +69,18 @@ monitoring.extractFromForm_ = function (str) {
     monitoring.title = title.value;
     mdparser.checkMarkdown(str);
     monitoring.saveToStorage_();
+    monitoring.checkInput_();
+}
+
+monitoring.checkInput_ = function () {
+    console.log("---monitoring.checkInput_---");
+    if (monitoring.content.length > 0 &&
+            monitoring.title.length > 0 &&
+            monitoring.dates.length > 1) {
+        chrome.runtime.sendMessage({method: "pgaction.changeOKIcon"});
+        return;
+    }
+    chrome.runtime.sendMessage({method: "pgaction.changeNGIcon"});
 }
 
 monitoring.saveToStorage_ = function () {

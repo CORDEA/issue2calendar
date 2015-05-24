@@ -23,6 +23,7 @@ background.selectedTab;
 
 background.initialize = function() {
     background.checkForValidUrl_();
+    background.listenForRequests_();
     chrome.storage.local.get('calendars', function(storage) {
         console.log(storage['calendars']);
     });
@@ -39,6 +40,33 @@ background.checkForValidUrl_ = function () {
             chrome.pageAction.show(tab.id);
             chrome.tabs.sendMessage(tab.id, {method: "background.startMonitoring"});
             background.selectedTab = tab.id;
+        }
+    });
+}
+
+background.listenForRequests_ = function () {
+    chrome.runtime.onMessage.addListener(function(request, sender, optCallback) {
+        switch (request.method) {
+            case "pgaction.changeOKIcon":
+                console.log("sender.tab.id: " + sender.tab.id);
+                chrome.pageAction.setIcon({
+                    tabId: sender.tab.id,
+                    path: {
+                        "19": "icons/i2c_ok_19.png",
+                        "38": "icons/i2c_ok_38.png"
+                    }
+                });
+                break;
+                
+            case "pgaction.changeNGIcon":
+                chrome.pageAction.setIcon({
+                    tabId: sender.tab.id,
+                    path: {
+                        "19": "icons/i2c_ng_19.png",
+                        "38": "icons/i2c_ng_38.png"
+                    }
+                });
+                break;
         }
     });
 }
