@@ -28,3 +28,5 @@ constants.CALENDAR_EVENTS_API_URL_ =
 
 constants.CALENDAR_LIST_API_URL_ =
     'https://www.googleapis.com/calendar/v3/users/me/calendarList'
+
+constants.PARSE_PER_CHARACTERS = 5

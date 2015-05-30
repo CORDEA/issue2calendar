@@ -58,9 +58,10 @@ monitoring.rewriteFormTag_ = function () {
 
 monitoring.textChange_ = function (str, flag) {
     console.log("---monitoring.textChange_---");
-    if (monitoring.onchange % 5 === 0 || !flag) {
+    if (monitoring.onchange % constants.PARSE_PER_CHARACTERS === 0 || !flag) {
         monitoring.extractFromForm_(str);
     }
+    monitoring.checkInput_();
     ++monitoring.onchange;
 }
 
@@ -69,7 +70,6 @@ monitoring.extractFromForm_ = function (str) {
     monitoring.title = title.value;
     mdparser.checkMarkdown(str);
     monitoring.saveToStorage_();
-    monitoring.checkInput_();
 }
 
 monitoring.checkInput_ = function () {
@@ -77,7 +77,12 @@ monitoring.checkInput_ = function () {
     if (monitoring.content.length > 0 &&
             monitoring.title.length > 0 &&
             monitoring.dates.length > 1) {
-        chrome.runtime.sendMessage({method: "pgaction.changeOKIcon"});
+        if (monitoring.emails.length === monitoring.mentionUsers) {
+            chrome.runtime.sendMessage({method: "pgaction.changeOKIcon"});
+        } else {
+            console.log(monitoring.emails.length + " : " + monitoring.mentionUsers);
+            chrome.runtime.sendMessage({method: "pgaction.changeLDIcon"});
+        }
         return;
     }
     chrome.runtime.sendMessage({method: "pgaction.changeNGIcon"});

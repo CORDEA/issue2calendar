@@ -23,7 +23,7 @@ calendar.requestAuthToken = function () {
     pgaction.log("---calendar.requestAuthToken---");
     chrome.identity.getAuthToken({"interactive": true}, function (authToken) {
         if (chrome.runtime.lastError || !authToken) {
-            pgaction.log("false");
+            pgaction.log(chrome.runtime.lastError.message);
             return;
         }
         pgaction.log(authToken);

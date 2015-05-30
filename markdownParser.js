@@ -104,14 +104,17 @@ mdparser.mentionParser_ = function (str) {
 
     var regex = new RegExp("\\s{4}[-+*]\\s+@");
     var lines = str.split('\n');
+
+    var users = 0;
     for (var i in lines) {
         if (regex.test(lines[i])) {
             var user = lines[i].replace(regex, '');
             var url  = constants.GITHUB_URL + user;
             mdparser.urlParser_(url);
-            ++monitoring.mentionUsers;
+            ++users;
         }
     }
+    monitoring.mentionUsers = users;
 }
 
 mdparser.urlParser_ = function (url) {

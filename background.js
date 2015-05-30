@@ -69,6 +69,16 @@ background.listenForRequests_ = function () {
                     }
                 });
                 break;
+
+            case "pgaction.changeLDIcon":
+                chrome.pageAction.setIcon({
+                    tabId: sender.tab.id,
+                    path: {
+                        "19": "icons/i2c_ld_19.png",
+                        "38": "icons/i2c_ld_38.png"
+                    }
+                });
+                break;
         }
     });
 }
