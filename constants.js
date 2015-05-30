@@ -21,6 +21,8 @@ var constants = {};
 
 constants.GITHUB_URL = 'https://github.com/'
 
+constants.GITHUB_ISSUE_URL = '/issues/new'
+
 constants.CALENDAR_EVENTS_API_URL_ =
     "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events"
 

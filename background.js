@@ -36,10 +36,12 @@ background.log = function(msg) {
 background.checkForValidUrl_ = function () {
     chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
         if (tab.url.indexOf(constants.GITHUB_URL) > -1
-                && tab.url.indexOf('issues') > -1) {
+                && tab.url.indexOf(constants.GITHUB_ISSUE_URL) > -1) {
             chrome.pageAction.show(tab.id);
             chrome.tabs.sendMessage(tab.id, {method: "background.startMonitoring"});
             background.selectedTab = tab.id;
+        } else {
+            chrome.pageAction.hide(tab.id);
         }
     });
 }

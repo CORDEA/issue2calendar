@@ -15,7 +15,7 @@
         "matches": [
             "https://github.com/*/issues/new"
         ],
-        "js":      ["lib/jquery.min.js", "monitoring.js", "markdownParser.js"],
+        "js":      ["lib/jquery.min.js", "monitoring.js", "markdownParser.js", "constants.js"],
         "run_at": "document_idle"
     }],
     "page_action": {

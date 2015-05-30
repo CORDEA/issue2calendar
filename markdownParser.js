@@ -107,7 +107,7 @@ mdparser.mentionParser_ = function (str) {
     for (var i in lines) {
         if (regex.test(lines[i])) {
             var user = lines[i].replace(regex, '');
-            var url  = "https://github.com/" + user;
+            var url  = constants.GITHUB_URL + user;
             mdparser.urlParser_(url);
             ++monitoring.mentionUsers;
         }
